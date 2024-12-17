@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, InvalidRequestError, OperationalError, DatabaseError, ProgrammingError
 from sqlalchemy.orm import Session
 from schema import Create, Response, SocialMediaModel
-from AES import encryption, decryption
+from AES import encrypt, decrypt
 from models import PersonalInfo, HotelInfo, AgencyInfo, PlatformInfo, SocialMediaInfo
 
 logging.basicConfig(level=LOG_LEVEL)
@@ -142,8 +142,8 @@ def create_socialmediainfo(input: Create, db: Session, hotel_info: HotelInfo) ->
                 sma_person=social_media_model.sma_person,
                 sma_email=social_media_model.sma_email,
                 sma_phone=social_media_model.sma_phone,
-                pageURL=encryption(social_media_model.pageURL),
-                pageID=encryption(social_media_model.pageID),
+                pageURL=encrypt(social_media_model.pageURL),
+                pageID=encrypt(social_media_model.pageID),
                 mi_fbm=social_media_model.mi_fbm,
                 added_dcube=social_media_model.added_dcube,
                 hid=hotel_info.hid,
@@ -262,13 +262,14 @@ def build_social_media_info_list(social_media_info_list: List[SocialMediaInfo], 
                 raise ValueError(f"No PlatformInfo found for plid: {sm_info.plid}")
             logger.info(f"Platfrom ID: {platform_info.platform_name} and Decrypted data: {decrypted_info.get(sm_info.plid)}")
             # Build the dictionary for this platform
+            decrypted_data = decrypted_info.get(sm_info.plid)
             result[platform_info.platform_name] = {
                 "sma_name": sm_info.sma_name,
                 "sma_person": sm_info.sma_person,
                 "sma_email": sm_info.sma_email,
                 "sma_phone": sm_info.sma_phone,
-                "pageURL": decrypted_info.get('pageURL'),
-                "pageID": decrypted_info.get('pageID'),
+                "pageURL": decrypted_data.get('pageURL'),
+                "pageID": decrypted_data.get('pageID'),
                 "mi_fbm": sm_info.mi_fbm,
                 "added_dcube": sm_info.added_dcube
             }
@@ -307,14 +308,13 @@ def get_info(eid: str, db: Session) -> dict:
     agency_info = db.query(AgencyInfo).filter(AgencyInfo.hid == hotel_info.hid).first()
 
     social_media_info = db.query(SocialMediaInfo).filter(SocialMediaInfo.hid == hotel_info.hid).all()
-    print(type(social_media_info))
     if not social_media_info:
         logger.error(f"SocialMediaInfo not found for hid {hotel_info.hid}")
         raise HTTPException(status_code=404, detail="SocialMediaInfo not found.")
     decrypted_info = {
         smi.plid: {
-            'pageURL': decryption(smi.pageURL),
-            'pageID': decryption(smi.pageID)
+            'pageURL': decrypt(smi.pageURL),
+            'pageID': decrypt(smi.pageID)
         }
         for smi in social_media_info
     }

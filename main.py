@@ -1,5 +1,6 @@
 import logging, uvicorn
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import get_db, create_tables
 from services import post_info, get_info 
@@ -20,6 +21,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = ["http://localhost:3000"],
+    allow_credential = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"]
+)
+
 @app.get('/')
 def root():
     return {'message': 'Connection established successfully'}
@@ -29,7 +38,7 @@ def info_input(input_data: Create, db: Session = Depends(get_db)):
     response_data = post_info(input_data, db)
     return Response(**response_data, **input_data.model_dump())
 
-@app.get("/info_output/{eid}",status_code=200)
+@app.get("/info_output/eid",status_code=200)
 def info_output(eid: str, db: Session = Depends(get_db)):
     response_data = get_info(eid, db)
     return response_data

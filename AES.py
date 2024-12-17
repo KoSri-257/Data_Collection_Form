@@ -18,7 +18,7 @@ if len(KEY) != 32:
 if not isinstance(KEY, bytes):
     raise TypeError(f"AES KEY must be of type 'bytes', but got {type(KEY)}.")
 
-def encryption(data: str) -> str:
+def encrypt(data: str) -> str:
     if data is None:
         raise ValueError("Input is missing.")
     if not isinstance(data, str):
@@ -39,7 +39,7 @@ def encryption(data: str) -> str:
     # Return IV + encrypted data as a hex-encoded string
     return (iv + encrypted_data).hex()
 
-def decryption(encrypted_data: str) -> str:
+def decrypt(encrypted_data: str) -> str:
     if encrypted_data is None:
         raise ValueError("Input is missing.")
     if not isinstance(encrypted_data, str):

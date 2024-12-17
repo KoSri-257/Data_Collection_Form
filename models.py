@@ -24,7 +24,7 @@ class HotelInfo(Base):
     country = Column(String, nullable=False)
     state = Column(String, nullable=False)
     city = Column(String, nullable=False)
-    zip_code = Column(String, nullable=False)
+    zip_code = Column(Integer, nullable=False)
     pid = Column(Integer, ForeignKey("personal_info.pid"), nullable=False, unique=True)
     # One-to-one relationship with PersonalInfo & AgencyInfo
     personal_info = relationship("PersonalInfo", back_populates="hotel_info", uselist=False)
