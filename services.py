@@ -30,21 +30,15 @@ def create_personalinfo(input: Create, db: Session) -> PersonalInfo:
     except IntegrityError as e:
         logger.exception("Violated Key constraint")
         raise HTTPException(status_code=409, detail=f"Integrity error: {str(e)}")
-    except TypeError as e:
-        logger.exception("Inappropriate type operation")
-        raise HTTPException(status_code=400, detail=f"Data error: {str(e)}")
-    except AttributeError as e:
-        logger.exception("Accessing non-existent attribute.")
-        raise HTTPException(status_code=400, detail=f"Attribute error: {str(e)}")
-    except InvalidRequestError as e:
-        logger.exception("Invalid queries!")
-        raise HTTPException(status_code=400, detail=f"Invalid request error: {str(e)}")
     except OperationalError as e:
         logger.exception("Connection failure!")
         raise HTTPException(status_code=500, detail=f"Operational error: {str(e)}")
     except ValidationError as e:
         logger.exception("Data is not meeting validation rules.")
         raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except ValueError as e:
+        logger.exception("Invalid value provided.")
+        raise HTTPException(status_code=422, detail=f"Value error: {str(e)}")
     except Exception as e:
         logger.exception("Error while creating PersonalInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while creating personal info: {str(e)}")
@@ -68,21 +62,15 @@ def create_hotelinfo(input: Create, db: Session, personal_info: PersonalInfo) ->
     except IntegrityError as e:
         logger.exception("Violated Key constraint")
         raise HTTPException(status_code=409, detail=f"Integrity error: {str(e)}")
-    except TypeError as e:
-        logger.exception("Inappropriate type operation")
-        raise HTTPException(status_code=400, detail=f"Data error: {str(e)}")
-    except AttributeError as e:
-        logger.exception("Accessing non-existent attribute.")
-        raise HTTPException(status_code=400, detail=f"Attribute error: {str(e)}")
-    except InvalidRequestError as e:
-        logger.exception("Invalid queries!")
-        raise HTTPException(status_code=400, detail=f"Invalid request error: {str(e)}")
     except OperationalError as e:
         logger.exception("Connection failure!")
         raise HTTPException(status_code=500, detail=f"Operational error: {str(e)}")
     except ValidationError as e:
         logger.exception("Data is not meeting validation rules.")
         raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except ValueError as e:
+        logger.exception("Invalid value provided.")
+        raise HTTPException(status_code=422, detail=f"Value error: {str(e)}")
     except Exception as e:
         logger.exception("Error while creating HotelInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while creating hotel info: {str(e)}")
@@ -106,21 +94,15 @@ def create_agencyinfo(input: Create, db: Session, hotel_info: HotelInfo) -> Agen
     except IntegrityError as e:
         logger.exception("Violated Key constraint")
         raise HTTPException(status_code=409, detail=f"Integrity error: {str(e)}")
-    except TypeError as e:
-        logger.exception("Inappropriate type operation")
-        raise HTTPException(status_code=400, detail=f"Data error: {str(e)}")
-    except AttributeError as e:
-        logger.exception("Accessing non-existent attribute.")
-        raise HTTPException(status_code=400, detail=f"Attribute error: {str(e)}")
-    except InvalidRequestError as e:
-        logger.exception("Invalid queries!")
-        raise HTTPException(status_code=400, detail=f"Invalid request error: {str(e)}")
     except OperationalError as e:
         logger.exception("Connection failure!")
         raise HTTPException(status_code=500, detail=f"Operational error: {str(e)}")
     except ValidationError as e:
         logger.exception("Data is not meeting validation rules.")
         raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except ValueError as e:
+        logger.exception("Invalid value provided.")
+        raise HTTPException(status_code=422, detail=f"Value error: {str(e)}")
     except Exception as e:
         logger.exception("Error while creating AgencyInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while creating agency info: {str(e)}")
@@ -161,21 +143,18 @@ def create_socialmediainfo(input: Create, db: Session, hotel_info: HotelInfo) ->
     except IntegrityError as e:
         logger.exception("Violated Key constraint")
         raise HTTPException(status_code=409, detail=f"Integrity error: {str(e)}")
-    except TypeError as e:
-        logger.exception("Inappropriate type operation")
-        raise HTTPException(status_code=400, detail=f"Data error: {str(e)}")
-    except AttributeError as e:
-        logger.exception("Accessing non-existent attribute.")
-        raise HTTPException(status_code=400, detail=f"Attribute error: {str(e)}")
-    except InvalidRequestError as e:
-        logger.exception("Invalid queries!")
-        raise HTTPException(status_code=400, detail=f"Invalid request error: {str(e)}")
     except OperationalError as e:
         logger.exception("Connection failure!")
         raise HTTPException(status_code=500, detail=f"Operational error: {str(e)}")
     except ValidationError as e:
         logger.exception("Data is not meeting validation rules.")
         raise HTTPException(status_code=400, detail=f"Validation error: {str(e)}")
+    except ValueError as e:
+        logger.exception("Invalid value provided.")
+        raise HTTPException(status_code=422, detail=f"Value error: {str(e)}")
+    except KeyError as e:
+        logger.exception("Missing or invalid key encountered.")
+        raise HTTPException(status_code=400, detail=f"Key error: {str(e)}")
     except Exception as e:
         logger.exception("Error while creating SocialMediaInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while creating social media info: {str(e)}")
@@ -203,6 +182,9 @@ def find_platform(platform_inputs: Dict[str, SocialMediaModel], db: Session) -> 
     except ProgrammingError as e:
         logger.exception("Data is not meeting validation rules.")
         raise HTTPException(status_code=500, detail=f"Validation error: {str(e)}")
+    except KeyError as e:
+        logger.exception("Missing or invalid key encountered.")
+        raise HTTPException(status_code=400, detail=f"Key error: {str(e)}")
     except Exception as e:
         logger.exception("An unexpected error occurred.")
         raise HTTPException(status_code=500, detail="An error occurred while fetching platform information.")
@@ -220,6 +202,9 @@ def build_personal_info(personal_info: PersonalInfo) -> dict:
             "country_code": personal_info.country_code,
             "ph_no": personal_info.ph_no
         }
+    except ValueError as e:
+        logger.exception("Invalid value provided.")
+        raise HTTPException(status_code=422, detail=f"Value error: {str(e)}")
     except Exception as e:
         logger.exception("Error while retrieving PersonalInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while retrieving personal info: {str(e)}")
@@ -235,6 +220,9 @@ def build_hotel_info(hotel_info: HotelInfo) -> dict:
             "city": hotel_info.city,
             "zip_code": hotel_info.zip_code
         }
+    except AttributeError as e:
+        logger.exception("Attribute not found or invalid operation on attribute.")
+        raise HTTPException(status_code=500, detail=f"Attribute error: {str(e)}")
     except Exception as e:
         logger.exception("Error while retrieving HotelInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while retrieving hotel info: {str(e)}")
@@ -248,6 +236,9 @@ def build_agency_info(agency_info: AgencyInfo) -> dict:
             "primary_phone": agency_info.primary_phone if agency_info else None,
             "not_applicable": agency_info.not_applicable if agency_info else None
         }
+    except AttributeError as e:
+        logger.exception("Attribute not found or invalid operation on attribute.")
+        raise HTTPException(status_code=500, detail=f"Attribute error: {str(e)}")
     except Exception as e:
         logger.exception("Error while retrieving AgencyInfo")
         raise HTTPException(status_code=500, detail=f"An error occurred while retrieving agency info: {str(e)}")
@@ -273,8 +264,10 @@ def build_social_media_info_list(social_media_info_list: List[SocialMediaInfo], 
                 "mi_fbm": sm_info.mi_fbm,
                 "added_dcube": sm_info.added_dcube
             }
-            
         return result
+    except ValueError as e:
+        logger.exception(f"Value error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Value error: {str(e)}")
     except Exception as e:
         logger.exception("Error while retrieving SocialMediaInfo")
         raise HTTPException(status_code=500, detail=f"Error while retrieving social media info: {str(e)}")

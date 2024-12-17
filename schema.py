@@ -15,6 +15,9 @@ class SocialMediaModel(BaseModel):
 
     @model_validator(mode='before')
     def validate_social_media(cls, values: dict):
+        sma_email = values.get('sma_email')
+        if sma_email and not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', sma_email):
+            raise ValueError("Invalid email address !(correct structure: user@example.com).")
         mi_fbm = values.get('mi_fbm')
         added_dcube = values.get('added_dcube')
         if mi_fbm:
@@ -65,11 +68,20 @@ class Base(BaseModel):
             # Validate country code (optional "+" followed by alphanumeric characters)
             country_code = values.get('country_code')
             if country_code and not re.match(r'^\+?[0-9a-zA-Z]+$', country_code):
-                raise ValueError("Invalid country code. It should start with an optional '+' followed by alphanumeric characters.")
+                raise ValueError("Invalid country code. Should start with '+' followed by alphanumeric characters.")
+            cls._validate_email_structure(values)
+
         except ValueError as e:
             raise ValueError(f"Validation error: {str(e)}")
-        
         return values
+    @staticmethod
+    def _validate_email_structure(values: dict):
+        email_fields = ['personal_email', 'primary_email']
+        for field in email_fields:
+            email = values.get(field)
+            if email and not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+                raise ValueError(f"Invalid email address for '{field}', (correct structure: user@example.com).")
+    
     
 class Create(Base):
     platform_inputs: Dict[str, SocialMediaModel]

@@ -24,7 +24,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ["http://localhost:3000"],
-    allow_credential = True,
+    allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"]
 )
@@ -38,7 +38,7 @@ def info_input(input_data: Create, db: Session = Depends(get_db)):
     response_data = post_info(input_data, db)
     return Response(**response_data, **input_data.model_dump())
 
-@app.get("/info_output/eid",status_code=200)
+@app.get("/info_output/{eid}",status_code=200)
 def info_output(eid: str, db: Session = Depends(get_db)):
     response_data = get_info(eid, db)
     return response_data
